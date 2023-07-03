@@ -9,7 +9,7 @@ export default class pendingBillingApi {
 
 
     findSettleList(params?: object) {
-        let url = '/api/data';
+        let url = '/api/get';
         return http.get(url, params);
     }
     addSettle(params: object) {
