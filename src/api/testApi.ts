@@ -7,7 +7,6 @@ export default class pendingBillingApi {
     constructor() {
     }
 
-
     findSettleList(params?: object) {
         let url = '/api/get';
         return http.get(url, params);
