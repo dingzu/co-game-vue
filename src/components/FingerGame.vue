@@ -18,6 +18,7 @@ import { useRouter } from 'vue-router'
 const http = new fingerApi();
 const router = useRouter()
 const player = router.currentRoute.value.params.player.toString()
+const recentPlayer = player == 'player1' ? 'player1' : 'player2'
 const otherPlayer = player == 'player1' ? 'player2' : 'player1'
 
 const turn: Number = 0
@@ -28,14 +29,14 @@ let bothPlayer = ref<ChooseBoth>({
   player2: "wait"
 })
 
-let playerData: Choose = {
-  turn: turn,
-  player: player === 'player1' ? 'player1' : player === 'player2' ? 'player2' : undefined,
-  choose: "wait"
-};
+// let playerData = ref<Choose>({
+//   turn: turn,
+//   player: player === 'player1' ? 'player1' : player === 'player2' ? 'player2' : undefined,
+//   choose: "wait"
+// });
 
 function isChoose(choose: fingertype) {
-  if (choose == playerData.choose) {
+  if (choose == bothPlayer.value[recentPlayer]) {
     return 'active'
   } else {
     return ''
@@ -47,8 +48,7 @@ function getChoose() {
     .getChoose()
     .then((result) => {
       bothPlayer.value = result
-      playerData.choose = result[player]
-      setTimeout(() => { getChoose() }, 1000)
+      // setTimeout(() => { getChoose() }, 1000)
     })
     .catch((err) => {
       console.log(err.message, "err");
@@ -56,13 +56,17 @@ function getChoose() {
 }
 
 function sendChoose(choose: fingertype) {
-  console.log('点了')
-  playerData.choose = choose
+  bothPlayer.value[recentPlayer] = choose
+  const param: Choose = {
+    turn: turn,
+    player: recentPlayer,
+    choose: bothPlayer.value[recentPlayer]
+  }
   http
-    .sendChoose(playerData)
+    .sendChoose(param)
     .then((result) => {
       if (result.player2 == "wait" || result.player1 == "wait") {
-        setTimeout(() => { getChoose() }, 1000)
+        // setTimeout(() => { getChoose() }, 1000)
       }
     })
     .catch((err) => { });
