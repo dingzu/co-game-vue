@@ -15,6 +15,7 @@
     </div>
     <div v-else>
       <div>你的对手选择了: {{ cnTrans(bothPlayer[otherPlayer].choose) }}</div>
+      <div>{{ gameOver() }}</div>
       <div class="button" @click="sendChoose(null, 'ready')" v-if="bothPlayer[recentPlayer].state != 'ready'">下一局</div>
       <div v-else>等待对手准备</div>
     </div>
