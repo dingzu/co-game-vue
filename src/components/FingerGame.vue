@@ -1,27 +1,28 @@
 <template>
-  <div>这是一个猜拳游戏</div>
+  <div>场上比分，胜利 {{ game.win }},落败 {{ game.lose }},平局 {{ game.equil }}</div>
   <div>你是：{{ player }}</div>
   <div>你的对手是：{{ otherPlayer }}</div>
   <div>你想要出什么?</div>
   <div>
-    <div @click="sendChoose('scissors')" :class="['button', isChoose('scissors')]">剪刀</div>
-    <div @click="sendChoose('stone')" :class="['button', isChoose('stone')]">石头</div>
-    <div @click="sendChoose('cloth')" :class="['button', isChoose('cloth')]">布</div>
+    <div @click="sendChoose('scissors', 'choosed')" :class="['button', isChoose('scissors')]">剪刀</div>
+    <div @click="sendChoose('stone', 'choosed')" :class="['button', isChoose('stone')]">石头</div>
+    <div @click="sendChoose('cloth', 'choosed')" :class="['button', isChoose('cloth')]">布</div>
   </div>
   <div class="mask" v-if="isShowMask(recentPlayer)">
-    <div>你选择了: {{ bothPlayer[recentPlayer] }}</div>
-    <div v-if="bothPlayer[otherPlayer] == 'wait' || bothPlayer[otherPlayer] == 'ready'">
+    <div>你选择了: {{ cnTrans(bothPlayer[recentPlayer].choose) }}</div>
+    <div v-if="bothPlayer[otherPlayer].state == 'wait'">
       <div>等待对手选择</div>
     </div>
     <div v-else>
-      <div>你的对手选择了: {{ bothPlayer[otherPlayer] }}</div>
-      <div class="button" @click="sendChoose('ready')">下一局</div>
+      <div>你的对手选择了: {{ cnTrans(bothPlayer[otherPlayer].choose) }}</div>
+      <div class="button" @click="sendChoose(null, 'ready')" v-if="bothPlayer[recentPlayer].state != 'ready'">下一局</div>
+      <div v-else>等待对手准备</div>
     </div>
   </div>
 </template>
 
 <script lang='ts' setup>
-import { fingerApi, Choose, ChooseBoth, fingertype } from "@/api/fingerApi";
+import { fingerApi, Choose, FingerData, fingertype, userState } from "@/api/fingerApi";
 import { onMounted, ref } from "vue";
 import { useRouter } from 'vue-router'
 const http = new fingerApi();
@@ -32,20 +33,86 @@ const otherPlayer = player == 'player1' ? 'player2' : 'player1'
 
 const turn: Number = 0
 
-let bothPlayer = ref<ChooseBoth>({
-  turn: turn,
-  player1: "wait",
-  player2: "wait"
+// 计分器
+let game = ref<{ [key: string]: number }>({
+  win: 0,
+  lose: 0,
+  equil: 0,
 })
 
-// let playerData = ref<Choose>({
-//   turn: turn,
-//   player: player === 'player1' ? 'player1' : player === 'player2' ? 'player2' : undefined,
-//   choose: "wait"
-// });
+let bothPlayer = ref<FingerData>({
+  turn: turn,
+  player1: {
+    choose: null,
+    state: 'wait'
+  },
+  player2: {
+    choose: null,
+    state: 'wait'
+  }
+})
+
+function gameOver() {
+  // 如果出布
+  if (bothPlayer.value[recentPlayer].choose == 'cloth') {
+    if (bothPlayer.value[otherPlayer].choose == 'cloth') {
+      game.value.win += 1
+      return "平局"
+    }
+    if (bothPlayer.value[otherPlayer].choose == 'stone') {
+      game.value.win += 1
+      return "你赢了"
+    }
+    if (bothPlayer.value[otherPlayer].choose == 'scissors') {
+      game.value.lose += 1
+      return "你输了"
+    }
+  }
+  // 如果出石头
+  if (bothPlayer.value[recentPlayer].choose == 'stone') {
+    if (bothPlayer.value[otherPlayer].choose == 'cloth') {
+      game.value.lose += 1
+      return "你输了"
+    }
+    if (bothPlayer.value[otherPlayer].choose == 'stone') {
+      game.value.win += 1
+      return "平局"
+    }
+    if (bothPlayer.value[otherPlayer].choose == 'scissors') {
+      game.value.win += 1
+      return "你赢了"
+    }
+  }
+  // 如果出剪刀
+  if (bothPlayer.value[recentPlayer].choose == 'scissors') {
+    if (bothPlayer.value[otherPlayer].choose == 'cloth') {
+      game.value.win += 1
+      return "你赢了"
+    }
+    if (bothPlayer.value[otherPlayer].choose == 'stone') {
+      game.value.lose += 1
+      return "你输了"
+    }
+    if (bothPlayer.value[otherPlayer].choose == 'scissors') {
+      game.value.equil += 1
+      return "平局"
+    }
+  }
+}
+
+function cnTrans(choose: fingertype) {
+  switch (choose) {
+    case 'cloth': return '布'
+    case 'stone': return '石头'
+    case 'scissors': return '剪刀'
+    case null: return '没选还'
+  }
+}
 
 function isShowMask(player: 'player1' | 'player2') {
-  if (bothPlayer.value[player] == "wait" || bothPlayer.value[player] == "ready") {
+  if (bothPlayer.value[player].choose == null
+    && bothPlayer.value[player].state == "wait"
+    && bothPlayer.value[otherPlayer].state == "wait") {
     return false
   }
   else {
@@ -54,7 +121,7 @@ function isShowMask(player: 'player1' | 'player2') {
 }
 
 function isChoose(choose: fingertype) {
-  if (choose == bothPlayer.value[recentPlayer]) {
+  if (choose == bothPlayer.value[recentPlayer].choose) {
     return 'active'
   } else {
     return ''
@@ -66,25 +133,35 @@ function getChoose() {
     .getChoose()
     .then((result) => {
       bothPlayer.value = result
-      // setTimeout(() => { getChoose() }, 1000)
+      // 轮询，等待对方玩家选择
+      if (result[otherPlayer].state == 'wait' && result[otherPlayer].choose != null) {
+        setTimeout(() => { getChoose() }, 1000)
+      }
+      // 轮询，等待对方玩家准备下一局
+      else if (result[player].state == 'ready' && result[otherPlayer].state != 'ready') {
+        setTimeout(() => { getChoose() }, 1000)
+      }
     })
     .catch((err) => {
       console.log(err.message, "err");
     });
 }
 
-function sendChoose(choose: fingertype) {
-  bothPlayer.value[recentPlayer] = choose
+function sendChoose(choose: fingertype, state: userState) {
+  bothPlayer.value[recentPlayer].choose = choose
+  bothPlayer.value[recentPlayer].state = state
   const param: Choose = {
     turn: turn,
     player: recentPlayer,
-    choose: bothPlayer.value[recentPlayer]
+    choose: bothPlayer.value[recentPlayer].choose,
+    state: bothPlayer.value[recentPlayer].state
   }
   http
     .sendChoose(param)
     .then((result) => {
-      if (result.player2 == "wait" || result.player1 == "wait") {
-        // setTimeout(() => { getChoose() }, 1000)
+      // 如果对方还没有选择，进行一次查询
+      if (result[otherPlayer].state == 'wait' && result[otherPlayer].choose != null) {
+        setTimeout(() => { getChoose() }, 1000)
       }
     })
     .catch((err) => { });

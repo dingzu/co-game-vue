@@ -3,19 +3,27 @@ import HttpHandler from "@/api/HttpHandler";
 const http: HttpHandler = new HttpHandler();
 
 // 单次出拳用户设置
-export type fingertype = "scissors" | "stone" | "cloth" | "ready" | "wait"
+export type fingertype = "scissors" | "stone" | "cloth" | null
+export type userState = "wait" | "choosed" | "ready"
 
 export interface Choose {
-    turn: Number,
+    turn: Number
     player: "player1" | "player2" | undefined
     choose: fingertype
+    state: userState
 }
 
 // 获取其他用户出拳设置
-export interface ChooseBoth {
+export interface FingerData {
     turn: Number
-    player1: fingertype
-    player2: fingertype
+    player1: {
+        choose: fingertype,
+        state: userState
+    }
+    player2: {
+        choose: fingertype,
+        state: userState
+    }
 }
 
 export class fingerApi {
