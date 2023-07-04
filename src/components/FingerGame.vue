@@ -8,7 +8,7 @@
     <div @click="sendChoose('stone', 'choosed')" :class="['button', isChoose('stone')]">石头</div>
     <div @click="sendChoose('cloth', 'choosed')" :class="['button', isChoose('cloth')]">布</div>
   </div>
-  <div class="mask" v-if="isShowMask(recentPlayer)">
+  <div class="mask" v-if="isShowMask()">
     <div>你选择了: {{ cnTrans(bothPlayer[recentPlayer].choose) }}</div>
     <div v-if="bothPlayer[otherPlayer].state == 'wait'">
       <div>等待对手选择</div>
@@ -110,10 +110,8 @@ function cnTrans(choose: fingertype) {
   }
 }
 
-function isShowMask(player: 'player1' | 'player2') {
-  if (bothPlayer.value[player].choose == null
-    && bothPlayer.value[player].state == "wait"
-    && bothPlayer.value[otherPlayer].state == "wait") {
+function isShowMask() {
+  if (bothPlayer.value[recentPlayer].state == 'wait') {
     return false
   }
   else {
