@@ -16,7 +16,8 @@
     <div v-else>
       <div>你的对手选择了: {{ cnTrans(bothPlayer[otherPlayer].choose) }}</div>
       <div>{{ gameOver() }}</div>
-      <div class="button" @click="sendChoose(null, 'ready')" v-if="bothPlayer[recentPlayer].state != 'ready'">下一局</div>
+      <div class="button" @click="gameOverSet(), sendChoose(null, 'ready')"
+        v-if="bothPlayer[recentPlayer].state != 'ready'">下一局</div>
       <div v-else>等待对手准备</div>
     </div>
   </div>
@@ -57,46 +58,76 @@ function gameOver() {
   // 如果出布
   if (bothPlayer.value[recentPlayer].choose == 'cloth') {
     if (bothPlayer.value[otherPlayer].choose == 'cloth') {
-      game.value.win += 1
       return "平局"
     }
     if (bothPlayer.value[otherPlayer].choose == 'stone') {
-      game.value.win += 1
       return "你赢了"
     }
     if (bothPlayer.value[otherPlayer].choose == 'scissors') {
-      game.value.lose += 1
       return "你输了"
     }
   }
   // 如果出石头
   if (bothPlayer.value[recentPlayer].choose == 'stone') {
     if (bothPlayer.value[otherPlayer].choose == 'cloth') {
-      game.value.lose += 1
       return "你输了"
     }
     if (bothPlayer.value[otherPlayer].choose == 'stone') {
-      game.value.win += 1
       return "平局"
     }
     if (bothPlayer.value[otherPlayer].choose == 'scissors') {
-      game.value.win += 1
       return "你赢了"
     }
   }
   // 如果出剪刀
   if (bothPlayer.value[recentPlayer].choose == 'scissors') {
     if (bothPlayer.value[otherPlayer].choose == 'cloth') {
-      game.value.win += 1
       return "你赢了"
     }
     if (bothPlayer.value[otherPlayer].choose == 'stone') {
-      game.value.lose += 1
       return "你输了"
     }
     if (bothPlayer.value[otherPlayer].choose == 'scissors') {
-      game.value.equil += 1
       return "平局"
+    }
+  }
+}
+
+function gameOverSet() {
+  // 如果出布
+  if (bothPlayer.value[recentPlayer].choose == 'cloth') {
+    if (bothPlayer.value[otherPlayer].choose == 'cloth') {
+      game.value.win += 1
+    }
+    if (bothPlayer.value[otherPlayer].choose == 'stone') {
+      game.value.win += 1
+    }
+    if (bothPlayer.value[otherPlayer].choose == 'scissors') {
+      game.value.lose += 1
+    }
+  }
+  // 如果出石头
+  if (bothPlayer.value[recentPlayer].choose == 'stone') {
+    if (bothPlayer.value[otherPlayer].choose == 'cloth') {
+      game.value.lose += 1
+    }
+    if (bothPlayer.value[otherPlayer].choose == 'stone') {
+      game.value.win += 1
+    }
+    if (bothPlayer.value[otherPlayer].choose == 'scissors') {
+      game.value.win += 1
+    }
+  }
+  // 如果出剪刀
+  if (bothPlayer.value[recentPlayer].choose == 'scissors') {
+    if (bothPlayer.value[otherPlayer].choose == 'cloth') {
+      game.value.win += 1
+    }
+    if (bothPlayer.value[otherPlayer].choose == 'stone') {
+      game.value.lose += 1
+    }
+    if (bothPlayer.value[otherPlayer].choose == 'scissors') {
+      game.value.equil += 1
     }
   }
 }
@@ -111,7 +142,7 @@ function cnTrans(choose: fingertype) {
 }
 
 function isShowMask() {
-  if (bothPlayer.value[recentPlayer].state == 'wait') {
+  if (bothPlayer.value[recentPlayer].state == 'wait' || bothPlayer.value[recentPlayer].choose == null) {
     return false
   }
   else {
@@ -132,8 +163,9 @@ function getChoose() {
     .getChoose()
     .then((result) => {
       bothPlayer.value = result
+      console.log('测试', bothPlayer.value)
       // 轮询，等待对方玩家选择
-      if (result[otherPlayer].state == 'wait' && result[otherPlayer].choose != null) {
+      if (result[otherPlayer].state == 'wait') {
         setTimeout(() => { getChoose() }, 1000)
       }
       // 轮询，等待对方玩家准备下一局
@@ -159,9 +191,8 @@ function sendChoose(choose: fingertype, state: userState) {
     .sendChoose(param)
     .then((result) => {
       // 如果对方还没有选择，进行一次查询
-      if (result[otherPlayer].state == 'wait' && result[otherPlayer].choose != null) {
-        setTimeout(() => { getChoose() }, 1000)
-      }
+      bothPlayer.value = result
+      setTimeout(() => { getChoose() }, 1000)
     })
     .catch((err) => { });
 }
