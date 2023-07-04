@@ -1,14 +1,23 @@
 <template>
   <div>这是一个猜拳游戏</div>
   <div>你是：{{ player }}</div>
+  <div>你的对手是：{{ otherPlayer }}</div>
   <div>你想要出什么?</div>
   <div>
     <div @click="sendChoose('scissors')" :class="['button', isChoose('scissors')]">剪刀</div>
     <div @click="sendChoose('stone')" :class="['button', isChoose('stone')]">石头</div>
     <div @click="sendChoose('cloth')" :class="['button', isChoose('cloth')]">布</div>
   </div>
-  <div>你的对手是：{{ otherPlayer }}</div>
-  <div>他出了: {{ bothPlayer[otherPlayer] }}</div>
+  <div class="mask" v-if="isShowMask(recentPlayer)">
+    <div>你选择了: {{ bothPlayer[recentPlayer] }}</div>
+    <div v-if="bothPlayer[otherPlayer] == 'wait' || bothPlayer[otherPlayer] == 'ready'">
+      <div>等待对手选择</div>
+    </div>
+    <div v-else>
+      <div>你的对手选择了: {{ bothPlayer[otherPlayer] }}</div>
+      <div class="button" @click="sendChoose('ready')">下一局</div>
+    </div>
+  </div>
 </template>
 
 <script lang='ts' setup>
@@ -34,6 +43,15 @@ let bothPlayer = ref<ChooseBoth>({
 //   player: player === 'player1' ? 'player1' : player === 'player2' ? 'player2' : undefined,
 //   choose: "wait"
 // });
+
+function isShowMask(player: 'player1' | 'player2') {
+  if (bothPlayer.value[player] == "wait" || bothPlayer.value[player] == "ready") {
+    return false
+  }
+  else {
+    return true
+  }
+}
 
 function isChoose(choose: fingertype) {
   if (choose == bothPlayer.value[recentPlayer]) {
@@ -89,5 +107,15 @@ onMounted(() => {
   &.active
     background-color #000
     color #fff
+.mask
+  position fixed
+  top 0
+  left 0
+  bottom 0
+  right 0
+  background-color rgba(0,0,0,.9)
+  color #fff
+  text-align center
+  padding 80px
 </style>
   
