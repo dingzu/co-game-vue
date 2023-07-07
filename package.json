@@ -17,6 +17,7 @@
     "@vue/cli-plugin-typescript": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "axios": "^1.4.0",
+    "pusher-js": "^8.2.0",
     "qs": "^6.11.2",
     "stylus": "^0.55.0",
     "stylus-loader": "^6.1.0",

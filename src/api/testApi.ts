@@ -2,16 +2,16 @@ import HttpHandler from "@/api/HttpHandler";
 
 const http: HttpHandler = new HttpHandler();
 
-export default class pendingBillingApi {
+export default class testApi {
 
     constructor() {
     }
 
-    findSettleList(params?: object) {
+    testGet(params?: object) {
         let url = '/api/get';
         return http.get(url, params);
     }
-    addSettle(params: object) {
+    testPost(params: object) {
         let url = '/api/post';
         return http.post(url, params);
     }

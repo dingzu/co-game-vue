@@ -9,6 +9,7 @@ module.exports = defineConfig({
       //   target: 'http://127.0.0.1:8888' // 我们要代理的真实接口地址
       // },
       '/api': {
+        // target: 'http://localhost:3008/',
         target: 'https://api.dingzu.site/',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, "")
