@@ -31,9 +31,10 @@ import {
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
+import Pusher from "pusher-js";
+
 const route = useRoute();
 const store = useStore();
-console.log(store.state.finger, route.params.tableIndex);
 let role = ref<"viewer" | "player1" | "player2">("viewer");
 let fingerData = ref<FingerDataType>({
   player1: {
@@ -57,6 +58,23 @@ if (
 ) {
   role = store.state.finger.role;
 }
+
+// 监听比赛信息
+Pusher.logToConsole = true;
+
+const pusher = new Pusher("691276eac4ced820a592", {
+  cluster: "ap1",
+});
+const fingerChannel = pusher.subscribe("finger-channel");
+const messageName = "table-detail-" + route.params.tableIndex;
+// 循环监听
+fingerChannel.bind(
+  messageName,
+  (message: { score: Array<number>; players: FingerDataType }) => {
+    console.log("获取到数据", message);
+    fingerData.value = message.players;
+  }
+);
 
 const http = new fingerApi();
 
