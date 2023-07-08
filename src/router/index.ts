@@ -3,17 +3,24 @@ import FingerGameRoom from '../views/FingerGameRoom.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/finger',
+    path: '/',
+    redirect: '/finger/room'
+  },
+  {
+    path: '/finger/room',
     name: 'home',
     component: FingerGameRoom,
-    children: [
-      {
-        path: ':player',
-        name: 'player',
-        component: () => import('../components/FingerGame.vue'),
-      }
-    ]
-  }
+  },
+  {
+    path: '/finger/:table/:player',
+    name: 'player',
+    component: () => import('../components/FingerGame.vue'),
+  },
+  {
+    path: '/test',
+    name: 'test',
+    component: () => import('../views/Test.vue'),
+  },
 ]
 
 const router = createRouter({

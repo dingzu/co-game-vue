@@ -24,7 +24,7 @@
 </template>
 
 <script lang='ts' setup>
-import { fingerApi, Choose, FingerData, fingertype, userState } from "@/api/fingerApi";
+import { fingerApi, Choose, FingerData, FingerType, UserStateType } from "@/api/fingerApi";
 import { onMounted, ref } from "vue";
 import { useRouter } from 'vue-router'
 const http = new fingerApi();
@@ -132,7 +132,7 @@ function gameOverSet() {
   }
 }
 
-function cnTrans(choose: fingertype) {
+function cnTrans(choose: FingerType) {
   switch (choose) {
     case 'cloth': return '布'
     case 'stone': return '石头'
@@ -150,7 +150,7 @@ function isShowMask() {
   }
 }
 
-function isChoose(choose: fingertype) {
+function isChoose(choose: FingerType) {
   if (choose == bothPlayer.value[recentPlayer].choose) {
     return 'active'
   } else {
@@ -178,7 +178,7 @@ function getChoose() {
     });
 }
 
-function sendChoose(choose: fingertype, state: userState) {
+function sendChoose(choose: FingerType, state: UserStateType) {
   bothPlayer.value[recentPlayer].choose = choose
   bothPlayer.value[recentPlayer].state = state
   const param: Choose = {
