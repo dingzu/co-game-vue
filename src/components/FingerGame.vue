@@ -10,11 +10,12 @@
         <div class="name">
           <p>{{ player.name }}</p>
         </div>
-        <div class="choose">
+        <div class="choose" v-if="player.state != 'wait'">
           <div class="scissors button">布</div>
           <div class="stone button">石头</div>
           <div class="cloth button">布</div>
         </div>
+        <div class="wait" v-else>等待玩家进入</div>
       </div>
     </div>
   </div>
@@ -37,12 +38,14 @@ let fingerData = ref<FingerDataType>({
     choose: null,
     state: "wait",
     turn: 0,
+    id: "",
   },
   player2: {
     name: "player2",
     choose: null,
     state: "wait",
     turn: 0,
+    id: "",
   },
 });
 

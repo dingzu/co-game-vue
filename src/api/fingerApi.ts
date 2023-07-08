@@ -11,6 +11,7 @@ export type EnterUserType = {
     tableIndex: number
     userName: String
     role: "player1" | "player2" | "viewer"
+    id: string
 }
 export type TablelistType = Array<TableType>
 export type FingerType = "scissors" | "stone" | "cloth" | null 
@@ -27,12 +28,14 @@ export interface FingerDataType {
         choose: FingerType,
         state: UserStateType,
         turn: Number
+        id: String
     }
     player2: {
         name: String,
         choose: FingerType,
         state: UserStateType,
         turn: Number
+        id: String
     }
 }
 
