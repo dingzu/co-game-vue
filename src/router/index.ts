@@ -12,8 +12,8 @@ const routes: Array<RouteRecordRaw> = [
     component: FingerGameRoom,
   },
   {
-    path: '/finger/:table/:player',
-    name: 'player',
+    path: '/finger/table/:tableIndex',
+    name: 'table',
     component: () => import('../components/FingerGame.vue'),
   },
   {

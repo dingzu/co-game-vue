@@ -29,7 +29,7 @@ import { onMounted, ref } from "vue";
 import { useRouter } from 'vue-router'
 const http = new fingerApi();
 const router = useRouter()
-const player = router.currentRoute.value.params.player.toString()
+const player = 'player1'
 const recentPlayer = player == 'player1' ? 'player1' : 'player2'
 const otherPlayer = player == 'player1' ? 'player2' : 'player1'
 
