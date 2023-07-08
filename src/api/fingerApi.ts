@@ -3,7 +3,6 @@ const http: HttpHandler = new HttpHandler();
 
 // 定义数据结构
 export type TableType = {
-    index: String
     player1: String | null
     player2: String | null
     Viewer: Array<String>
@@ -22,15 +21,18 @@ export interface Choose {
     choose: FingerType
     state: UserStateType
 }
-export interface FingerData {
-    turn: Number
+export interface FingerDataType {
     player1: {
+        name: String,
         choose: FingerType,
-        state: UserStateType
+        state: UserStateType,
+        turn: Number
     }
     player2: {
+        name: String,
         choose: FingerType,
-        state: UserStateType
+        state: UserStateType,
+        turn: Number
     }
 }
 

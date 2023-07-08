@@ -37,6 +37,8 @@ import { fingerApi, TablelistType, EnterUserType } from "@/api/fingerApi";
 import { defineComponent, onMounted, ref } from "vue";
 import Pusher from "pusher-js";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
+const store = useStore();
 
 const router = useRouter();
 
@@ -62,7 +64,7 @@ fingerChannel.bind("table-list", (message: TablelistType) => {
 function getTableList() {
   http
     .getTableList()
-    .then((data) => {
+    .then((data: TablelistType) => {
       tableList.value = data;
       console.log("获取到游戏桌情况:", data);
     })
@@ -85,12 +87,12 @@ function enterTable(role: "player1" | "player2", index: number) {
         if (data.access == true) {
           alert("进入房间");
           console.log(index);
+          store.commit("setFinger", { index: index, role: role });
           fingerChannel.unbind("table-list"); // 停止监听
           router.push({
             name: "table",
             params: {
               tableIndex: index,
-              role: role, // 这个参数不会出现在URL中
             },
           });
         } else {
