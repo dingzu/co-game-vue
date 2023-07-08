@@ -16,4 +16,3 @@ export default class testApi {
         return http.post(url, params);
     }
 }
-

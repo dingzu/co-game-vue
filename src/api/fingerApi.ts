@@ -13,11 +13,11 @@ export type EnterUserType = {
     role: "player1" | "player2" | "viewer"
 }
 export type TablelistType = Array<TableType>
-export type FingerType = "scissors" | "stone" | "cloth" | null // 出拳类型分成剪刀石头和布
-export type UserStateType = "wait" | "choosed" | "ready"           // 用户状态分为等待，已选择，准备下一局
+export type FingerType = "scissors" | "stone" | "cloth" | null 
+export type UserStateType = "wait" | "choosed" | "ready"           
 export interface Choose {
     turn: Number
-    player: "player1" | "player2" | "viewer"                   // viewer 是观众
+    player: "player1" | "player2" | "viewer"                   
     choose: FingerType
     state: UserStateType
 }
@@ -44,6 +44,10 @@ export class fingerApi {
         let url = '/api/finger/get-table-list';
         return http.get(url);
     }
+    getDetail(params:{index:number}) {
+        let url = '/api/finger/get-detail';
+        return http.post(url, params);
+    }    
     enterTable(params: EnterUserType) {
         let url = '/api/finger/enter-table';
         return http.post(url, params);

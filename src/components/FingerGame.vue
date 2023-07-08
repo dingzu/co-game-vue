@@ -21,13 +21,7 @@
 </template>
 
 <script lang='ts' setup>
-import {
-  fingerApi,
-  Choose,
-  FingerDataType,
-  FingerType,
-  UserStateType,
-} from "@/api/fingerApi";
+import { fingerApi, FingerDataType } from "@/api/fingerApi";
 import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
@@ -35,6 +29,7 @@ import Pusher from "pusher-js";
 
 const route = useRoute();
 const store = useStore();
+const nowIndex = route.params.tableIndex;
 let role = ref<"viewer" | "player1" | "player2">("viewer");
 let fingerData = ref<FingerDataType>({
   player1: {
@@ -52,10 +47,7 @@ let fingerData = ref<FingerDataType>({
 });
 
 // 获取当前用户身份，默认是观众
-if (
-  store.state.finger.index == route.params.tableIndex &&
-  store.state.finger.role != null
-) {
+if (store.state.finger.index == nowIndex && store.state.finger.role != null) {
   role = store.state.finger.role;
 }
 
@@ -66,7 +58,7 @@ const pusher = new Pusher("691276eac4ced820a592", {
   cluster: "ap1",
 });
 const fingerChannel = pusher.subscribe("finger-channel");
-const messageName = "table-detail-" + route.params.tableIndex;
+const messageName = "table-detail-" + nowIndex;
 // 循环监听
 fingerChannel.bind(
   messageName,
@@ -78,7 +70,20 @@ fingerChannel.bind(
 
 const http = new fingerApi();
 
-onMounted(() => {});
+function getDetal() {
+  http
+    .getDetail({ index: Number(nowIndex) })
+    .then((data) => {
+      fingerData.value = data.players;
+    })
+    .catch((err) => {
+      console.log(err.message, "err");
+    });
+}
+
+onMounted(() => {
+  getDetal();
+});
 </script>
 
 <style lang="stylus">
