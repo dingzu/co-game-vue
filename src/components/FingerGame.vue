@@ -43,6 +43,9 @@
               等待对方
             </div>
           </div>
+          <div v-else-if="player.state == 'choosed'" class="mask">
+            <p>玩家选择了{{ transCn(player.choose || "") }}</p>
+          </div>
           <!--我方界面-->
           <div class="yours" v-if="role == key">
             <div class="button-group">
@@ -336,10 +339,10 @@ onBeforeUnmount(() => {
       gap 12px
     .mask
       position absolute
-      top 0
-      right 0
-      bottom 0
-      left 0
+      top -2px
+      right -2px
+      bottom -2px
+      left -2px
       z-index 100
       display flex
       flex-direction column
