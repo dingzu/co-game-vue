@@ -58,6 +58,10 @@ export class fingerApi {
         let url = '/api/finger/enter-table';
         return http.post(url, params);
     }
+    leaveTable(params: { id:string }) {
+        let url = '/api/finger/leave-table';
+        return http.post(url, params);
+    }
     sendChoose(params: Choose) {
         let url = '/api/finger/send';
         return http.post(url, params);

@@ -18,12 +18,17 @@
         <div class="wait" v-else>等待玩家进入</div>
       </div>
     </div>
+    <div class="user-set">
+      <router-link to="/finger/room">
+        <div class="button">退出</div>
+      </router-link>
+    </div>
   </div>
 </template>
 
 <script lang='ts' setup>
 import { fingerApi, FingerDataType } from "@/api/fingerApi";
-import { onMounted, ref } from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import Pusher from "pusher-js";
@@ -55,13 +60,13 @@ if (store.state.finger.index == nowIndex && store.state.finger.role != null) {
 }
 
 // 监听比赛信息
-Pusher.logToConsole = true;
-
 const pusher = new Pusher("691276eac4ced820a592", {
   cluster: "ap1",
+  authEndpoint: process.env.VUE_APP_API_URL + "api/pusher/auth",
 });
-const fingerChannel = pusher.subscribe("finger-channel");
+const fingerChannel = pusher.subscribe("presence-finger-channel");
 const messageName = "table-detail-" + nowIndex;
+console.log("messageName", messageName);
 // 监听
 fingerChannel.bind(
   messageName,
@@ -84,20 +89,42 @@ function getDetal() {
     });
 }
 
-function sendHeartbeat() {
+function leaveTable() {
   http
-    .sendHeartbeat({ userId: store.state.pusherId })
-    .then()
+    .leaveTable({ id: store.state.pusherId })
+    .then((data) => {
+      console.log(data);
+    })
     .catch((err) => {
       console.log(err.message, "err");
     });
 }
 
+function sendHeartbeat() {
+  console.log("心跳检查");
+  if (store.state.pusherId) {
+    http.sendHeartbeat({ userId: store.state.pusherId }).catch((err) => {
+      console.log(err.message, "err");
+    });
+  } else {
+    console.log("pusherId is not defined");
+  }
+}
+
+let heartbeatIntervalId: number | undefined;
+
 onMounted(() => {
-  getDetal();
-  setTimeout(() => {
-    sendHeartbeat();
-  }, 5 * 1000);
+  try {
+    getDetal();
+  } catch (err) {
+    console.log("Error in getDetal:", err);
+  }
+  heartbeatIntervalId = setInterval(sendHeartbeat, 1 * 1000);
+});
+
+onBeforeUnmount(() => {
+  leaveTable();
+  clearInterval(heartbeatIntervalId);
 });
 </script>
 
@@ -124,5 +151,18 @@ onMounted(() => {
   .player-ground.yours > .choose > .button:hover
     border 1px solid #000
     cursor pointer
+
+.user-set
+  margin-top 12px
+  a
+    color #000
+    text-decoration none
+  .button
+    padding 12px
+    border 1px solid #ccc
+    text-align center
+    &:hover
+      border 1px solid #000
+      cursor pointer
 </style>
   

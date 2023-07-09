@@ -43,7 +43,7 @@ const router = useRouter();
 
 const http = new fingerApi();
 let tableList = ref<TablelistType>([]);
-let userName = ref<String>("我莫得名字");
+let userName = ref<String>("无名用户");
 let isMask = ref<Boolean>(false);
 
 const pusher = new Pusher("691276eac4ced820a592", {
