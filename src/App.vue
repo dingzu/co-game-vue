@@ -11,7 +11,7 @@ const pusher = new Pusher("691276eac4ced820a592", {
   authEndpoint: process.env.VUE_APP_API_URL + "api/pusher/auth",
 });
 
-Pusher.logToConsole = true;
+// Pusher.logToConsole = true;
 
 pusher.connection.bind("connected", function () {
   const pusherId = pusher.connection.socket_id;

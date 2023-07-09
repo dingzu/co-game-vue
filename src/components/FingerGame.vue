@@ -34,11 +34,12 @@
 <script lang='ts' setup>
 import { fingerApi, FingerDataType } from "@/api/fingerApi";
 import { onBeforeUnmount, onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import Pusher from "pusher-js";
 
 const route = useRoute();
+const router = useRouter();
 const store = useStore();
 const nowIndex = route.params.tableIndex;
 let role = ref<"viewer" | "player1" | "player2">("viewer");
@@ -72,13 +73,23 @@ const pusher = new Pusher("691276eac4ced820a592", {
 });
 const fingerChannel = pusher.subscribe("presence-finger-channel");
 const messageName = "table-detail-" + nowIndex;
-console.log("messageName", messageName);
 // 监听
 fingerChannel.bind(
   messageName,
   (message: { score: Array<number>; players: FingerDataType }) => {
-    console.log("获取到数据", message);
+    console.log("获取到数据", message, store.state.finger.role);
     fingerData.value = message.players;
+    score.value = message.score;
+    if (
+      store.state.finger.role == "player1" &&
+      store.state.pusherId != message.players.player1.id
+    ) {
+      router.push({
+        name: "room",
+      });
+      store.commit("setFinger", { index: -1, role: "viewer" });
+      alert("你断开了游戏");
+    }
   }
 );
 

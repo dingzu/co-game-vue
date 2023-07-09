@@ -8,7 +8,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/finger/room',
-    name: 'home',
+    name: 'room',
     component: FingerGameRoom,
   },
   {

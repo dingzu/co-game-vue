@@ -17,17 +17,16 @@ export type TablelistType = Array<TableType>
 export type FingerType = "scissors" | "stone" | "cloth" | null 
 export type UserStateType = "wait" | "choosed" | "ready"           
 export interface Choose {
-    turn: Number
-    player: "player1" | "player2" | "viewer"                   
+    turn: number
+    role: "player1" | "player2" | "viewer"                   
     choose: FingerType
-    state: UserStateType
 }
 export interface FingerDataType {
     player1: {
         name: String,
         choose: FingerType,
         state: UserStateType,
-        turn: Number
+        turn: number
         id: String
     }
     player2: {
