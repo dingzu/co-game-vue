@@ -207,9 +207,10 @@ function nextTurn(role: "player1" | "player2") {
     return;
   }
   // 积分
-  if (winOrLose("player1").key == "win") {
+  console.log("积分测试", winOrLose(role).key);
+  if (winOrLose(role).key == "win") {
     score.value[0] += 1;
-  } else if (winOrLose("player1").key == "lose") {
+  } else if (winOrLose(role).key == "lose") {
     score.value[1] += 1;
   } else {
     score.value[2] += 1;
