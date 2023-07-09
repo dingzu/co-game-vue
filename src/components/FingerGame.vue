@@ -19,6 +19,11 @@
       </div>
     </div>
     <div class="user-set">
+      <div class="content">
+        <p>{{ fingerData.player1.name }} 胜利: {{ score[0] }}</p>
+        <p>{{ fingerData.player2.name }} 胜利: {{ score[1] }}</p>
+        <p>平局: {{ score[2] }}</p>
+      </div>
       <router-link to="/finger/room">
         <div class="button">退出</div>
       </router-link>
@@ -37,6 +42,7 @@ const route = useRoute();
 const store = useStore();
 const nowIndex = route.params.tableIndex;
 let role = ref<"viewer" | "player1" | "player2">("viewer");
+let score = ref<Array<number>>([0, 0, 0]);
 let fingerData = ref<FingerDataType>({
   player1: {
     name: "player1",
@@ -164,5 +170,9 @@ onBeforeUnmount(() => {
     &:hover
       border 1px solid #000
       cursor pointer
+  .content
+    margin-bottom 12PX
+    padding 12px
+    border 1px solid #ccc
 </style>
   
