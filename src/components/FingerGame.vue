@@ -1,21 +1,36 @@
 <template>
   <div class="finger-game">
     <div class="battle-ground">
-      <div
-        v-for="(player, key) in fingerData"
-        :key="key"
-        class="player-ground"
-        :class="role == key ? 'yours' : ''"
-      >
+      <div v-for="(player, key) in fingerData" :key="key" class="player-ground">
         <div class="name">
           <p>{{ player.name }}</p>
         </div>
-        <div class="choose" v-if="player.state != 'wait'">
-          <div class="scissors button">布</div>
-          <div class="stone button">石头</div>
-          <div class="cloth button">布</div>
+        <div class="choose">
+          <!--遮挡-->
+          <div class="mask" v-if="player.state == 'wait'">等待中</div>
+          <div class="mask" v-else-if="fingerData.player1.state == 'wait'">
+            等待 player1
+          </div>
+          <div class="mask" v-else-if="fingerData.player2.state == 'wait'">
+            等待 player2
+          </div>
+          <!--我方界面-->
+          <div class="yours" v-if="role == key">
+            <div class="button-group">
+              <div class="scissors button click-able">布</div>
+              <div class="stone button click-able">石头</div>
+              <div class="cloth button click-able">布</div>
+            </div>
+          </div>
+          <!--对方界面-->
+          <div class="anti" v-else>
+            <div class="button-group">
+              <div class="scissors button">布</div>
+              <div class="stone button">石头</div>
+              <div class="cloth button">布</div>
+            </div>
+          </div>
         </div>
-        <div class="wait" v-else>等待玩家进入</div>
       </div>
     </div>
     <div class="user-set">
@@ -158,16 +173,30 @@ onBeforeUnmount(() => {
     padding 12px
     border 1px solid #ccc
     gap 12px
-    .choose
+    .choose, .button-group
+      position relative
       display flex
       flex-direction column
       gap 12px
+    .mask
+      position absolute
+      top 0
+      right 0
+      bottom 0
+      left 0
+      z-index 100
+      padding 20px
+      border 1px solid #ccc
+      background-color #f5f5f5
+      text-align center
+    .button.click-able:hover
+      border 1px solid #000
     .button
       padding 12px
       border 1px solid #ccc
-  .player-ground.yours > .choose > .button:hover
-    border 1px solid #000
-    cursor pointer
+      &.active, &.active:hover
+        background #ccc
+        color #fff
 
 .user-set
   margin-top 12px

@@ -18,6 +18,7 @@ export type FingerType = "scissors" | "stone" | "cloth" | null
 export type UserStateType = "wait" | "choosed" | "ready"           
 export interface Choose {
     turn: number
+    tableIndex: number
     role: "player1" | "player2" | "viewer"                   
     choose: FingerType
 }
