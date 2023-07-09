@@ -7,7 +7,7 @@
         </div>
         <div class="choose">
           <!--遮挡-->
-          <div class="mask" v-if="player.state == 'wait'">等待中</div>
+          <div class="mask" v-if="player.state == 'wait'">没有玩家</div>
           <div class="mask" v-else-if="fingerData.player1.state == 'wait'">
             等待 player1
           </div>
@@ -17,15 +17,44 @@
           <!--我方界面-->
           <div class="yours" v-if="role == key">
             <div class="button-group">
-              <div class="scissors button click-able">布</div>
-              <div class="stone button click-able">石头</div>
-              <div class="cloth button click-able">布</div>
+              <div
+                class="scissors button click-able"
+                :class="player.choose == 'scissors'"
+                @click="sendChoose('scissors', key)"
+              >
+                剪刀
+              </div>
+              <div
+                class="stone button click-able"
+                :class="player.choose == 'stone'"
+                @click="sendChoose('stone', key)"
+              >
+                石头
+              </div>
+              <div
+                class="cloth button click-able"
+                :class="player.choose == 'cloth'"
+                @click="sendChoose('cloth', key)"
+              >
+                布
+              </div>
             </div>
           </div>
           <!--对方界面-->
           <div class="anti" v-else>
+            <div
+              class="mask"
+              style="z-index: 99"
+              v-if="
+                fingerData.player1.turn == fingerData.player2.turn &&
+                (fingerData.player1.state == 'ready' ||
+                  fingerData.player2.state == 'ready')
+              "
+            >
+              等待对方选择
+            </div>
             <div class="button-group">
-              <div class="scissors button">布</div>
+              <div class="scissors button">剪刀</div>
               <div class="stone button">石头</div>
               <div class="cloth button">布</div>
             </div>
@@ -47,7 +76,12 @@
 </template>
 
 <script lang='ts' setup>
-import { fingerApi, FingerDataType } from "@/api/fingerApi";
+import {
+  fingerApi,
+  FingerDataType,
+  FingerType,
+  UserStateType,
+} from "@/api/fingerApi";
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
@@ -124,6 +158,33 @@ function getDetal() {
 function leaveTable() {
   http
     .leaveTable({ id: store.state.pusherId })
+    .then((data) => {
+      console.log(data);
+    })
+    .catch((err) => {
+      console.log(err.message, "err");
+    });
+}
+
+function sendChoose(choose: FingerType, role: "player1" | "player2") {
+  // 如果轮次不一样，则退出
+  if (fingerData.value.player1.turn != fingerData.value.player2.turn) {
+    return;
+  }
+  // 如果不在 ready 状态，则退出
+  if (fingerData.value[role].state != "ready") {
+    return;
+  }
+  // 如果轮次一样，发送数据
+  const params = {
+    turn: fingerData.value[role].turn,
+    tableIndex: Number(nowIndex),
+    role: role,
+    choose: choose,
+  };
+  fingerData.value[role].state = "choosed";
+  http
+    .sendChoose(params)
     .then((data) => {
       console.log(data);
     })

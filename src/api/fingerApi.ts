@@ -34,7 +34,7 @@ export interface FingerDataType {
         name: String,
         choose: FingerType,
         state: UserStateType,
-        turn: Number
+        turn: number
         id: String
     }
 }
