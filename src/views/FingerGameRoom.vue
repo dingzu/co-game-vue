@@ -34,7 +34,7 @@
 
 <script lang="ts" setup>
 import { fingerApi, TablelistType, EnterUserType } from "@/api/fingerApi";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, watchEffect } from "vue";
 import Pusher from "pusher-js";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
@@ -43,7 +43,12 @@ const router = useRouter();
 
 const http = new fingerApi();
 let tableList = ref<TablelistType>([]);
-let userName = ref<String>("无名用户");
+let userName = ref(localStorage.getItem("userName") || "无名用户");
+
+watchEffect(() => {
+  localStorage.setItem("userName", userName.value);
+});
+
 let isMask = ref<Boolean>(false);
 
 const pusher = new Pusher("691276eac4ced820a592", {

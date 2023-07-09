@@ -44,7 +44,10 @@
             </div>
           </div>
           <div v-else-if="player.state == 'choosed'" class="mask">
-            <p>玩家选择了{{ transCn(player.choose || "") }}</p>
+            <p v-if="key == role">
+              玩家选择了{{ transCn(player.choose || "") }}
+            </p>
+            <p v-else>对方已完成选择</p>
           </div>
           <!--我方界面-->
           <div class="yours" v-if="role == key">
