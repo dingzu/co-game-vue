@@ -22,6 +22,11 @@ export interface Choose {
     role: "player1" | "player2" | "viewer"                   
     choose: FingerType
 }
+export interface ChangeTurn {
+    turn: number
+    tableIndex: number
+    role: "player1" | "player2" | "viewer"                   
+}
 export interface FingerDataType {
     player1: {
         name: String,
@@ -64,6 +69,10 @@ export class fingerApi {
     }
     sendChoose(params: Choose) {
         let url = '/api/finger/send';
+        return http.post(url, params);
+    }
+    sendTurn(params: ChangeTurn) {
+        let url = '/api/finger/next-turn';
         return http.post(url, params);
     }
     getChoose() {
