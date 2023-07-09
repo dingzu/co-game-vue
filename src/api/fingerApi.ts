@@ -38,10 +38,13 @@ export interface FingerDataType {
         id: String
     }
 }
-
 // Api
 export class fingerApi {
     constructor() {
+    }
+    sendHeartbeat(params:{userId:string}) {
+        let url = '/api/heartbeat';
+        return http.post(url, params);
     }
     getTableList() {
         let url = '/api/finger/get-table-list';

@@ -62,7 +62,7 @@ const pusher = new Pusher("691276eac4ced820a592", {
 });
 const fingerChannel = pusher.subscribe("finger-channel");
 const messageName = "table-detail-" + nowIndex;
-// 循环监听
+// 监听
 fingerChannel.bind(
   messageName,
   (message: { score: Array<number>; players: FingerDataType }) => {
@@ -84,8 +84,20 @@ function getDetal() {
     });
 }
 
+function sendHeartbeat() {
+  http
+    .sendHeartbeat({ userId: store.state.pusherId })
+    .then()
+    .catch((err) => {
+      console.log(err.message, "err");
+    });
+}
+
 onMounted(() => {
   getDetal();
+  setTimeout(() => {
+    sendHeartbeat();
+  }, 5 * 1000);
 });
 </script>
 

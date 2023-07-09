@@ -39,29 +39,20 @@ import Pusher from "pusher-js";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 const store = useStore();
-
 const router = useRouter();
 
 const http = new fingerApi();
 let tableList = ref<TablelistType>([]);
 let userName = ref<String>("我莫得名字");
 let isMask = ref<Boolean>(false);
-let pusherId: string = "";
-
-// 监听游戏桌情况
-Pusher.logToConsole = true;
 
 const pusher = new Pusher("691276eac4ced820a592", {
   cluster: "ap1",
   authEndpoint: process.env.VUE_APP_API_URL + "api/pusher/auth",
 });
-pusher.connection.bind("connected", function () {
-  pusherId = pusher.connection.socket_id;
-  console.log("生成ID", pusherId);
-});
 const fingerChannel = pusher.subscribe("presence-finger-channel");
-// 循环监听
 
+// 循环监听
 fingerChannel.bind("table-list", (message: TablelistType) => {
   console.log("获取到数据", message);
   tableList.value = message;
@@ -87,7 +78,7 @@ function enterTable(role: "player1" | "player2", index: number) {
       tableIndex: index,
       userName: userName.value,
       role: role,
-      id: pusherId,
+      id: store.state.pusherId,
     };
     http
       .enterTable(param)
